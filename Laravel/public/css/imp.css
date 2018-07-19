@@ -1,0 +1,36 @@
+h1 {
+  background-color: #BC8F8F;
+  border: 2px solid black;
+  font-style: bold;
+  font-size: 50px;
+}
+.main-info{
+  border: 1px solid black;
+  min-height: 300px;
+}
+.hreff{
+	font-size: 30px;
+	color: #696969;
+}
+.in_line{
+	display: inline-block;
+}
+.text{
+	min-height: 100px;
+	min-width: 400px;
+}
+.theme{
+	min-width: 400px;
+}
+.result{
+	border: 1px solid black;
+	font-size: 20px;
+}
+.registr{
+	font-size: 30px;
+	border: 1px solid black;
+}
+.text{
+	font-size: 40px;
+	color: #FF0000;
+}
