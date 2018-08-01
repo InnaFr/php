@@ -6,24 +6,11 @@ use DB;
 
 use Illuminate\Http\Request ;
 use App\Http\Requests ;
-
+use App\persons;
+use App\post;
 class NewController extends Controller
 {
-    public function InsertIntoDb()
-    {
-        DB::insert('insert into people (login, password, firstName, lastName, age, email, country) values (?, ?, ?, ?, ?, ?, ?)', ['Admin', 'pass', 'Инна', 'Шутова', 19,'i.schutowa2011@yandex.ru', 'Russia']);
-        return 'Должно работать';
-    }
-
-    public function SelectFromDB()
-    {
-    	$result =  DB::select('select * from people where login=?', ['Admin'])[0];
-    	/*$mas;
-    	foreach ($result as $v) {
-    		$mas = $v->age;	
-    	}*/
-    	return $result->id;
-    }
+   
 
     public function DeleteAllPosts()
     {
@@ -59,15 +46,22 @@ class NewController extends Controller
         {
             $bool_one=null;
             $bool_two=null;
-            $bool_one = DB::select('select age from people where login=?', [$login]);
-            $bool_two = DB::select('select * from people where email=?', [$email]);
+            $bool_one = persons::where('login', $login)->first();
+            echo $bool_one;
+            $bool_two = persons::where('email', $email)->first();
+            echo $bool_two;
             if ($bool_one==null && $bool_two==null)
             {
-                DB::insert('insert into people 
-                            (login, password, firstName, lastName, email, age, country) 
-                            values (?, ?, ?, ?, ?, ?, ?)',
-                            [$login, $password, $firstName, $lastName, $email, $age, $country]);
-                $result =  DB::select('select * from posts');
+                $pers = new persons;
+                $pers->login = $login;
+                $pers->password = $password;
+                $pers->firstName = $firstName;
+                $pers->lastName = $lastName;
+                $pers->email = $email;
+                $pers->age = $age;
+                $pers->country = $country;
+                $pers->save();
+                $result =  post::all();
                 return View('blog.guest', ['result'=>$result]);
             }
             else
@@ -91,7 +85,8 @@ class NewController extends Controller
         if ($login!=null && $password!=null)
         {
             $control=null;
-            $control = DB::select('select * from people where login=?', [$login])[0];
+            $control = persons::where('login', [$login])->first();
+  //          DB::select('select * from people where login=?', [$login])[0];
             if ($password==$control->password)
             {
                 return redirect()->action('NewController@loadInform', ['login'=>$login]);
@@ -103,10 +98,20 @@ class NewController extends Controller
         }
     }
 
+
+    // public function loadInform(){
+
+
+    //     $pers = persons::all();
+
+    //     foreach ($pers as $per) {
+    //       echo $per->login;
+    //   }
+    // }
      public function loadInform(Request $request)
     {
         $result = null;
-        $result =  DB::select('select * from posts');
+        $result =  post::all();
         $login=null;
         $login = $request->get('login');
 
@@ -125,9 +130,17 @@ class NewController extends Controller
         $theme = $request->get('Theme');
         $text = $request->get('Text');
         $login = $request->get('Login');
-        if ($theme!=null && $text!=null && $login!=null) DB::insert('insert into posts (text, theme, author) values (?, ?, ?)', [$text, $theme, $login]);
-        $result =  DB::select('select * from posts');
-        return redirect('/')->with('result', $result);
+        if ($theme!=null && $text!=null && $login!=null) 
+        {
+            $post = new post();
+            $post->text = $text;
+            $post->theme = $theme;
+            $post->author = $login;
+            $post->save();
+        }
+        
+        $result =  post::all();
+        return redirect()->action('NewController@loadInform', ['login'=>$login]);
     }
 
 
